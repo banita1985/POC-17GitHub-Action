@@ -1,27 +1,22 @@
-# -------- Stage 1: Build --------
-FROM maven:3.8.6-openjdk-11 AS builder  
-
-
-# Set working directory
+# === Builder Stage ===
+FROM maven:3.8.6-openjdk-11 AS builder
 WORKDIR /app
 
-# Copy all files to container
+# Copy all files into the container
 COPY . .
 
-# Build the project
+# Build the WAR file (skip tests to save time)
 RUN mvn clean package -DskipTests
 
-# -------- Stage 2: Run --------
+# === Runtime Stage ===
 FROM openjdk:11-jre-slim
-
-# Set working directory
 WORKDIR /app
 
-# Copy the jar from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the generated WAR file from builder
+COPY --from=builder /app/target/*.war app.war
 
-# Expose application port
+# Expose port 8080
 EXPOSE 8080
 
-# Start the app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the WAR file using Java
+CMD ["java", "-jar", "app.war"]
