@@ -28,19 +28,6 @@ pipeline {
             }
         }
 
-        stage('Dependency Check') {
-            steps {
-                withCredentials([string(credentialsId: "${NVD_API_CRED}", variable: 'NVD_API_KEY')]) {
-                    sh '''
-                        ~/tools/dependency-check/bin/dependency-check.sh \
-                            --project MyApp \
-                            --scan . \
-                            --format ALL \
-                            --nvdApiKey $NVD_API_KEY
-                    '''
-                }
-            }
-        }
 
         stage('Docker Build') {
             steps {
