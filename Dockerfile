@@ -1,14 +1,26 @@
-# Use official Tomcat image as base
-FROM tomcat:9.0
+# -------- Stage 1: Build --------
+FROM maven:3.8.6-openjdk-17 AS builder
 
-# Remove default apps from webapps
-RUN rm -rf /usr/local/tomcat/webapps/*
+# Set working directory
+WORKDIR /app
 
-# Copy your WAR file to the webapps folder
-COPY target/sample-webapp.war /usr/local/tomcat/webapps/ROOT.war
+# Copy all files to container
+COPY . .
 
-# Expose port 8080
+# Build the project
+RUN mvn clean package -DskipTests
+
+# -------- Stage 2: Run --------
+FROM openjdk:11-jre-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy the jar from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose application port
 EXPOSE 8080
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+# Start the app
+ENTRYPOINT ["java", "-jar", "app.jar"]
