@@ -1,0 +1,104 @@
+pipeline {
+ agent any
+ 
+ environment {
+       SONARQUBE = credentials('sonar-token') // Jenkins Credentials ID
+       DOCKER_IMAGE = "hello-webapp"
+       DOCKER_TAG = "v1.0.${BUILD_NUMBER}"
+       REGISTRY = "docker.io"
+      
+ }
+ 
+ stages {
+   stage('checkout'){
+       steps{
+           git branch: 'main', credentialsId: 'github-creds', url: 'https://github.com/banita1985/Sample-javawebapp.git'
+       }
+   }
+    stage('Compile Code') {
+           steps {
+                   dir('my-app'){
+                       sh 'mvn clean compile'
+                   }
+           }
+       }
+ 
+       stage('Unit Tests') {
+           steps {
+               dir('my-app'){
+                   sh 'mvn test'
+               }
+              
+           }
+       }
+ 
+       stage('Code Quality Check') {
+           steps {
+              withSonarQubeEnv('SonarQubeServer') {
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONARQUBE -Dsonar.exclusions=**/test/**,**/docs/**'
+ 
+               }
+           }
+       }
+       /*stage('Quality Gate') {
+           steps {
+               script {
+                 waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+               }
+           }
+       }*/
+ 
+       stage('Trivy Scan') {
+           steps {
+               sh 'trivy fs . --exit-code 0 || true'
+           }
+       }
+ 
+       stage('Build Jar') {
+           steps {
+               dir('my-app'){
+                   sh 'mvn package'
+               }
+              
+           }
+       }
+       stage('Build Docker Image') {
+           steps {
+              withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                   sh "docker build -t $DOCKER_IMAGE:$DOCKER_TAG ."
+               }
+              
+           }
+       }
+       stage('Push to Nexus') {
+           steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                // Use --password-stdin for secure login
+                  sh """
+                  echo "$PASSWORD" | docker login $REGISTRY --username $USERNAME --password-stdin
+                  docker tag $DOCKER_IMAGE:$DOCKER_TAG iamsnaaz/my-docker-registry:$DOCKER_TAG
+                  docker push iamsnaaz/my-docker-registry:$DOCKER_TAG
+               """
+             }
+          }
+ 
+       }
+   stage('Deploy to Kubernetes') {
+ steps {
+   withCredentials([file(credentialsId: 'kubeconfig-cluster', variable: 'KUBECONFIG')]) {
+     sh 'kubectl get pods -A'
+     sh 'kubectl apply -f deployment.yml'
+   }
+ }
+}
+}
+  post {
+       success {
+           emailext (
+               subject: "SUCCESS: ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+               body: "Good news!\n\nThe build ${env.BUILD_NUMBER} of job ${env.JOB_NAME} was successful.\n\nCheck it at ${env.BUILD_URL}",
+               to: 'sadiyanaaz4255@gmail.com'
+           )
+       }
+   }
+}
