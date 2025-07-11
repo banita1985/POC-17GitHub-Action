@@ -9,14 +9,16 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # === Runtime Stage ===
-FROM openjdk:11-jre-slim
-WORKDIR /app
+FROM tomcat:9-jdk11
+WORKDIR /usr/local/tomcat/webapps/
 
-# Copy the generated WAR file from builder
-COPY --from=builder /app/target/*.war app.war
+# Remove default webapps (optional but clean)
+RUN rm -rf ROOT*
 
-# Expose port 8080
+# Copy the WAR from builder and rename as ROOT.war so it's auto-deployed
+COPY --from=builder /app/target/*.war ROOT.war
+
+# Expose Tomcat's default port
 EXPOSE 8080
 
-# Run the WAR file using Java
-CMD ["java", "-jar", "app.war"]
+# Tomcat's CMD already starts the server, no need to override
