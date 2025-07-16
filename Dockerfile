@@ -1,21 +1,12 @@
-FROM maven:3.8.6-openjdk-11 AS builder
-WORKDIR /app
+FROM tomcat:9-jre11
 
-# Copy all files into the container
-COPY . .
+# Remove default webapps
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Build the WAR file (skip tests to save time)
-RUN mvn clean package -DskipTests
+# Copy WAR into Tomcat webapps directory
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-# === Runtime Stage ===
-FROM openjdk:11-jre-slim
-WORKDIR /app
-
-# Copy the generated WAR file from builder
-COPY --from=builder /app/target/*.war app.war
-
-# Expose port 8080
 EXPOSE 8080
 
-# Run the WAR file using Java
-CMD ["java", "-jar", "app.war"]
+CMD ["catalina.sh", "run"]
+
