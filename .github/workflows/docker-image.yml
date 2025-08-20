@@ -1,0 +1,20 @@
+name: POC-17
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs: 
+  build-deploy: 
+    runs-on: ubuntu-latest
+    env :
+    
+    steps:
+
+    #step 1 Checkout the Repo
+     - name: checkout the code
+     - uses: actions/checkout@v4
+
+     #step 2 Build the Docker image
+     - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
