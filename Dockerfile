@@ -7,9 +7,8 @@ RUN mvn clean package -DskipTests
 # ===== Runtime Stage =====
 FROM tomcat:9-jre11
 RUN rm -rf /usr/local/tomcat/webapps/*
-COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=builder /app/target/poc-17.jar /app/poc-17.jar
 
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+CMD ["java", "-jar", "/app/poc-17.jar"]
 
 
