@@ -6,7 +6,7 @@ RUN mvn clean package -DskipTests
 
 # ===== Runtime Stage =====
 FROM openjdk:17
-COPY --from=builder /app/target/poc-17.jar /app/poc-17.jar
+COPY --from=builder target/*.jar /app/poc-17.jar
 
 CMD ["java", "-jar", "/app/poc-17.jar"]
 
