@@ -35,10 +35,10 @@ jobs:
       uses: SonarSource/sonarcloud-github-action@v2
       with:
         projectBaseDir: .
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: "https://sonarcloud.io"
-
+        args: >
+          -Dsonar.organization=banita1985
+          -Dsonar.projectKey=POC-17GitHub-Action
+     
     # Step 6: Log in to Docker Hub
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
