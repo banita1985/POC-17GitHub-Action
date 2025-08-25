@@ -30,16 +30,14 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean verify -Ddependency-check.skip=true
 
-    # step 5: Sonar qube scan
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v2
-      with:
-        projectBaseDir: .
-        args: >
-          -Dsonar.organization=banita1985
-          -Dsonar.projectKey=POC-17GitHub-Action
-          -Dsonar.sources=.
-          -Dsonar.java.binaries=target/classes
+    # Step 5: Run SonarQube scan
+    - name: Build and analyze with SonarQube
+      run: | 
+          mvn sonar:sonar \
+              -Dsonar.projectKey=banita1985_POC-17GitHub-Action \
+              -Dsonar.organization=banita1985 \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=$SONAR_TOKEN
 
      
     # Step 6: Log in to Docker Hub
