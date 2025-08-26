@@ -71,7 +71,7 @@ jobs:
 
     # Step 9: Update kubeconfig for EKS
     - name: Update kubeconfig
-      run: aws eks update-kubeconfig --name my-eks-cluster --region ${{ secrets.AWS_REGION }}
+      run: aws eks update-kubeconfig --name poc-eks-cluster --region ${{ secrets.AWS_REGION }}
 
     # Step 10: Deploy to EKS
     - name: Deploy to EKS
