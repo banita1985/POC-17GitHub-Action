@@ -1,9 +1,9 @@
 name: Terraform EKS Setup
 
 on:
+  workflow_dispatch:   # allows manual trigger
   push:
-    paths:
-      - 'infra/**'
+    branches: [ "master" ] 
 
 jobs:
   terraform:
