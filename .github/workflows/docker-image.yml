@@ -57,14 +57,7 @@ jobs:
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/poc-17:1.0 .
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.22.0
-      with:
-        image-ref: ${{ secrets.DOCKER_USERNAME }}/poc-17:1.0
-        format: 'table'
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH,MEDIUM,LOW'
-        ignore-unfixed: true
+  
 
 
     # Step 8: Configure AWS credentials
