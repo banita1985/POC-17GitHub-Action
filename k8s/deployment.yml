@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
       - name: poc-17-container
-        image: banitap1985/poc-17:1.0
+        image: banitap1985/poc-17:1.0   # ✅ Your Docker Hub image
+        imagePullPolicy: Always         # ✅ Always pull the latest pushed image
         ports:
-        - containerPort: 8080
+        - containerPort: 8080           # ✅ Match the port your app listens on
