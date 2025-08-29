@@ -57,6 +57,12 @@ jobs:
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/poc-17:1.0 .
 
+        # Step 7: Push Docker Image
+    - name: Push Docker Image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/poc-17:1.0
+
+
   
 
 
