@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: poc-17-container
-        image: your-docker-username/poc-17:1.0
+        image: banitap1985/poc-17:1.0
         ports:
-        - containerPort: 8086
+        - containerPort: 8080
